@@ -1,17 +1,18 @@
 # API Académica
 
-API educativa para crear y consultar cursos académicos con **FastAPI, SQLModel y SQLite**. El código incluye comentarios en español para estudiar cómo se conectan las rutas HTTP, la validación de datos y la persistencia.
+API educativa para administrar cursos y estudiantes con **FastAPI, SQLModel y SQLite**. El código incluye comentarios en español para estudiar cómo se conectan las rutas HTTP, la validación de datos y la persistencia.
 
 La explicación detallada del proyecto, la práctica con Swagger y los ejercicios están en la [guía para estudiantes](docs.md).
 
 ## Funcionalidades
 
-- Crear cursos con nombre, créditos y estado activo.
-- Consultar todos los cursos o buscar uno por su identificador.
-- Validar los datos de entrada y responder con errores HTTP.
-- Conservar los registros en una base de datos SQLite local.
+- **Cursos:** CRUD completo. Crear, consultar (lista o por ID), actualizar con `PUT` (actualización completa) y eliminar con `DELETE`.
+- **Estudiantes:** crear, listar y consultar por ID, con nombre, correo, semestre y estado activo.
+- Validar los datos de entrada y responder con errores HTTP (`404` para recursos inexistentes y `422` para datos inválidos).
+- Conservar los registros en una base de datos SQLite local (`database.db`), con una tabla por recurso (`course` y `student`).
+- Informe de pruebas con evidencias en la carpeta [entrega-pruebas](entrega-pruebas/informe-pruebas.md).
 
-El proyecto implementa creación y consulta. La actualización, eliminación, autenticación y paginación quedan como posibles ampliaciones.
+Quedan fuera del alcance la relación entre estudiantes y cursos, la matrícula, la actualización y eliminación de estudiantes, la autenticación y la paginación.
 
 ## Tecnologías
 
@@ -67,13 +68,25 @@ La base de datos y sus tablas se crean al iniciar la aplicación. Ejecuta el com
 
 ## Endpoints
 
+### Courses
+
 | Método | Ruta | Operación | Estado de éxito |
 | --- | --- | --- | --- |
 | `POST` | `/courses` | Crear un curso. | `201` |
 | `GET` | `/courses` | Listar todos los cursos. | `200` |
 | `GET` | `/courses/{course_id}` | Consultar un curso por ID. | `200` |
+| `PUT` | `/courses/{course_id}` | Actualizar un curso (los tres campos son obligatorios). | `200` |
+| `DELETE` | `/courses/{course_id}` | Eliminar un curso; responde `{"message": "Course deleted"}`. | `200` |
 
-Un curso inexistente devuelve `404`. Los datos que incumplen el esquema devuelven `422`. La ruta `/` no está definida; utiliza `/docs` o `/courses`.
+### Students
+
+| Método | Ruta | Operación | Estado de éxito |
+| --- | --- | --- | --- |
+| `POST` | `/students` | Crear un estudiante. | `201` |
+| `GET` | `/students` | Listar todos los estudiantes (`[]` si no hay). | `200` |
+| `GET` | `/students/{student_id}` | Consultar un estudiante por ID. | `200` |
+
+Un curso o estudiante inexistente devuelve `404` (`Course not found` / `Student not found`). Los datos que incumplen el esquema y los IDs que no son enteros devuelven `422`. La ruta `/` no está definida; utiliza `/docs`.
 
 ## Ejemplo de uso
 
@@ -116,21 +129,46 @@ El ID es ilustrativo: SQLite lo asigna automáticamente. Usa el valor recibido p
 | `credits` | Obligatorio; entero entre 1 y 6. |
 | `active` | Opcional; booleano con valor predeterminado `true`. |
 
+`PUT /courses/{course_id}` usa el esquema `CourseUpdate`: `name`, `credits` y `active` son **obligatorios** (con las mismas reglas de nombre y créditos). El `id` no se puede modificar.
+
+### Reglas de entrada de estudiantes
+
+| Campo | Regla |
+| --- | --- |
+| `name` | Obligatorio; entre 3 y 80 caracteres. |
+| `email` | Obligatorio; no puede estar vacío (no se valida el formato). |
+| `semester` | Obligatorio; entero entre 1 y 10. |
+| `active` | Opcional; booleano con valor predeterminado `true`. |
+
 ## Estructura del proyecto
 
 ```text
-fastapi_academica/
-├── main.py                     # Aplicación y ciclo de vida
-├── database/database.py        # Motor SQLite y sesiones
-├── models/course.py            # Modelo de la tabla de cursos
-├── schemas/course.py           # Esquemas de entrada y salida
-├── routers/courses.py          # Endpoints HTTP
-├── services/course_service.py  # Creación y consulta de registros
-├── requirements.txt            # Dependencias
-├── docs.md                     # Guía didáctica detallada
-└── README.md                   # Presentación e inicio rápido
+api_acad-mica/
+├── main.py                       # Aplicación, ciclo de vida y registro de routers
+├── database/database.py          # Motor SQLite y sesiones
+├── models/
+│   ├── course.py                 # Modelo de la tabla course
+│   └── student.py                # Modelo de la tabla student
+├── schemas/
+│   ├── course.py                 # CourseCreate, CourseUpdate y CourseResponse
+│   └── student.py                # StudentCreate y StudentResponse
+├── routers/
+│   ├── courses.py                # Endpoints HTTP de cursos
+│   └── students.py               # Endpoints HTTP de estudiantes
+├── services/
+│   ├── course_service.py         # Crear, listar, consultar, actualizar y eliminar cursos
+│   └── student_service.py        # Crear, listar y consultar estudiantes
+├── entrega-pruebas/
+│   ├── informe-pruebas.md        # Informe con todas las pruebas realizadas
+│   └── evidencias/               # Salida real de cada ejecución
+├── requirements.txt              # Dependencias
+├── docs.md                       # Guía didáctica detallada
+├── ejercicio.md                  # Retos de la actividad
+└── README.md                     # Presentación e inicio rápido
 ```
 
-El flujo principal es: **petición HTTP → router y validación → servicio → base de datos → respuesta JSON**.
+El flujo principal es: **petición HTTP → router y validación (schema) → servicio → modelo y sesión → SQLite → respuesta JSON**. La lógica de datos vive en los servicios; los routers solo reciben la petición y delegan.
+
+Los cursos y los estudiantes comparten el mismo motor y el mismo archivo `database.db`, que contiene las tablas `course` y `student`. El archivo no se sube al repositorio (está en `.gitignore`).
 
 Para seguir el código paso a paso, comprender `Depends`, `Session`, `commit()` y `refresh()`, o resolver problemas de ejecución, consulta [docs.md](docs.md).
