@@ -338,8 +338,3 @@ los mensajes "Student not found" y el router con el prefijo /students. No
 necesito otro motor porque el engine solo apunta al archivo database.db, y un 
 mismo archivo puede tener varias tablas (course y student).
 
-# 12. ¿Cómo agregaste la tabla Student a la aplicación?
-# Primero creé models/student.py con table=True, después schemas/student.py 
-# (StudentCreate y StudentResponse), services/student_service.py y 
-# routers/students.py, sin mezclarlo con Course. Luego en main.py importé el 
-# router de
