@@ -7,7 +7,8 @@ from schemas.course import CourseCreate, CourseResponse
 from services.course_service import (
     create_course,
     list_courses,
-    get_course
+    get_course,
+    delete_course
 )
 
 
@@ -62,6 +63,21 @@ def get_course_endpoint(
 ):
 
     return get_course(
+        course_id,
+        session
+    )
+
+
+# DELETE /courses/{course_id}: elimina el curso y responde 200 con un mensaje.
+# si el id no es entero fastapi responde 422 solo, y si no existe el service lanza 404.
+@router.delete("/{course_id}")
+def delete_course_endpoint(
+    course_id: int,
+    # Depends obtiene y libera la sesión mediante get_session.
+    session: Session = Depends(get_session)
+):
+
+    return delete_course(
         course_id,
         session
     )

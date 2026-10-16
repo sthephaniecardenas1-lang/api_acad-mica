@@ -59,3 +59,23 @@ def get_course(
         )
 
     return course
+
+
+def delete_course(
+    course_id: int,
+    session: Session
+):
+
+    # reutilizo get_course: si el id no existe ya lanza el 404 "Course not found"
+    course = get_course(
+        course_id,
+        session
+    )
+
+    # marca el registro para borrarlo de la tabla
+    session.delete(course)
+    # sin commit el borrado no queda guardado en database.db
+    session.commit()
+
+    # el mensaje se devuelve solo despues de confirmar el borrado
+    return {"message": "Course deleted"}
