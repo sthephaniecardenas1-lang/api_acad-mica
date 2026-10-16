@@ -172,40 +172,38 @@ El flujo principal es: **petición HTTP → router y validación (schema) → se
 Los cursos y los estudiantes comparten el mismo motor y el mismo archivo `database.db`, que contiene las tablas `course` y `student`. El archivo no se sube al repositorio (está en `.gitignore`).
 
 Para seguir el código paso a paso, comprender `Depends`, `Session`, `commit()` y `refresh()`, o resolver problemas de ejecución, consulta [docs.md](docs.md).
-# 
-# TALLER: FASTAPI, SQLMODEL Y ARQUITECTURA EN CAPAS
-# 
+TALLER: FASTAPI, SQLMODEL Y ARQUITECTURA EN CAPAS
 
-# 1. ¿Cuál es la función de un router?
-# El router es el que recibe la petición HTTP. Ahí declaro cada endpoint 
-# con su método y su ruta (por ejemplo @router.put("/{course_id}")), y con 
-# APIRouter le pongo un prefijo (/courses o /students) y una etiqueta para que 
-# en Swagger salgan agrupados. Lo importante es que el router no tiene la lógica 
-# de datos: solo recibe lo que llega, deja que FastAPI lo valide con el schema, 
-# llama a la función del service y devuelve la respuesta. Y para que funcione 
-# hay que registrarlo en main.py con include_router; si no, la ruta no aparece 
-# en Swagger.
+1. ¿Cuál es la función de un router?
+El router es el que recibe la petición HTTP. Ahí declaro cada endpoint 
+con su método y su ruta (por ejemplo @router.put("/{course_id}")), y con 
+APIRouter le pongo un prefijo (/courses o /students) y una etiqueta para que 
+en Swagger salgan agrupados. Lo importante es que el router no tiene la lógica 
+de datos: solo recibe lo que llega, deja que FastAPI lo valide con el schema, 
+llama a la función del service y devuelve la respuesta. Y para que funcione 
+hay que registrarlo en main.py con include_router; si no, la ruta no aparece 
+en Swagger.
 
 
-# 2. ¿Cuál es la diferencia entre un schema y un model?
-# El schema (por ejemplo CourseCreate o StudentResponse) es una clase de 
-# Pydantic y sirve para validar el JSON que llega y para definir cómo se ve la 
-# respuesta; no toca la base de datos. El model (Course o Student) es una clase 
-# de SQLModel con table=True, o sea que representa una tabla real con sus columnas. 
-# Se nota la diferencia en el id: CourseCreate no lo tiene porque el cliente no 
-# lo manda, pero el model Course sí, como clave primaria, porque lo genera 
-# SQLite al guardar. Y CourseResponse sí lo incluye porque es lo que le devuelvo 
-# al cliente.
+2. ¿Cuál es la diferencia entre un schema y un model?
+El schema (por ejemplo CourseCreate o StudentResponse) es una clase de 
+Pydantic y sirve para validar el JSON que llega y para definir cómo se ve la 
+respuesta; no toca la base de datos. El model (Course o Student) es una clase 
+de SQLModel con table=True, o sea que representa una tabla real con sus columnas. 
+Se nota la diferencia en el id: CourseCreate no lo tiene porque el cliente no 
+lo manda, pero el model Course sí, como clave primaria, porque lo genera 
+SQLite al guardar. Y CourseResponse sí lo incluye porque es lo que le devuelvo 
+al cliente.
 
 
-# 3. ¿Por qué la lógica de DELETE debe estar en el service?
-# Porque cada capa tiene su trabajo. El router se encarga de la parte 
-# web y el service de la lógica: buscar el curso, lanzar el 404 si no existe, 
-# borrarlo y confirmar el cambio. Si metiera eso en el router, quedaría todo 
-# mezclado y el día que cambie cómo se guardan los datos tendría que tocar los 
-# endpoints. Además así el código se puede reutilizar: en mi delete_course 
-# reutilicé get_course, que ya sabe lanzar el "Course not found", y no tuve que 
-# repetir esa validación.
+3. ¿Por qué la lógica de DELETE debe estar en el service?
+Porque cada capa tiene su trabajo. El router se encarga de la parte 
+web y el service de la lógica: buscar el curso, lanzar el 404 si no existe, 
+borrarlo y confirmar el cambio. Si metiera eso en el router, quedaría todo 
+mezclado y el día que cambie cómo se guardan los datos tendría que tocar los 
+endpoints. Además así el código se puede reutilizar: en mi delete_course 
+reutilicé get_course, que ya sabe lanzar el "Course not found", y no tuve que 
+repetir esa validación.
 
 def delete_course(course_id: int, session: Session):
     course = get_course(course_id, session)   # Si no existe, lanza el 404
@@ -214,83 +212,83 @@ def delete_course(course_id: int, session: Session):
     return {"message": "Course deleted"}
 
 
-# 4. ¿Qué función cumple Session?
-# La Session es el objeto con el que el service habla con la base de 
-# datos. Con ella hago session.add() para agregar, session.get() para buscar 
-# por clave primaria, session.exec(select(...)) para consultar, session.delete() 
-# para borrar y session.commit() para confirmar. Los cambios quedan pendientes 
-# en la sesión hasta que hago commit. Se abre una por petición y se cierra sola 
-# cuando termina.
+4. ¿Qué función cumple Session?
+La Session es el objeto con el que el service habla con la base de 
+datos. Con ella hago session.add() para agregar, session.get() para buscar 
+por clave primaria, session.exec(select(...)) para consultar, session.delete() 
+para borrar y session.commit() para confirmar. Los cambios quedan pendientes 
+en la sesión hasta que hago commit. Se abre una por petición y se cierra sola 
+cuando termina.
 
 
-# 5. ¿Para qué sirve session.commit()?
-# Cuando hago add, delete o modifico un objeto, el cambio solo está en 
-# la sesión, todavía no en la base. El commit es el que lo confirma y lo escribe 
-# de verdad en el archivo database.db. Si me olvido del commit, la API puede 
-# responder bien pero el dato no persiste: por ejemplo, un DELETE que dice 
-# "Course deleted" pero el curso sigue apareciendo después. Por eso en mi código 
-# el mensaje de éxito se devuelve después del commit.
+5. ¿Para qué sirve session.commit()?
+Cuando hago add, delete o modifico un objeto, el cambio solo está en 
+la sesión, todavía no en la base. El commit es el que lo confirma y lo escribe 
+de verdad en el archivo database.db. Si me olvido del commit, la API puede 
+responder bien pero el dato no persiste: por ejemplo, un DELETE que dice 
+"Course deleted" pero el curso sigue apareciendo después. Por eso en mi código 
+el mensaje de éxito se devuelve después del commit.
 
 
-# 6. ¿Por qué utilizamos session.refresh() después de crear un registro?
-# Cuando creo el objeto Course o Student, el id todavía es None porque 
-# lo asigna SQLite al insertarlo. Después del commit hago refresh() para que el 
-# objeto se vuelva a cargar con lo que quedó guardado, y así ya trae el id 
-# generado. Si no lo hiciera, la respuesta del POST no traería el id correcto. 
-# También lo uso en el PUT para devolver el curso tal cual quedó actualizado.
+6. ¿Por qué utilizamos session.refresh() después de crear un registro?
+Cuando creo el objeto Course o Student, el id todavía es None porque 
+lo asigna SQLite al insertarlo. Después del commit hago refresh() para que el 
+objeto se vuelva a cargar con lo que quedó guardado, y así ya trae el id 
+generado. Si no lo hiciera, la respuesta del POST no traería el id correcto. 
+También lo uso en el PUT para devolver el curso tal cual quedó actualizado.
 
 
-# 7. ¿Qué hace Depends(get_session)?
-# Depends es la inyección de dependencias de FastAPI. Cuando el endpoint 
-# tiene el parámetro session: Session = Depends(get_session), FastAPI ejecuta 
-# get_session, que abre la sesión con el engine, se la pasa al endpoint y cuando 
-# la petición termina la cierra automáticamente, porque la función usa con (with) 
-# y yield. Con eso no tengo que crear ni cerrar la sesión a mano en cada endpoint, 
-# y los cursos y los estudiantes usan exactamente la misma función.
+7. ¿Qué hace Depends(get_session)?
+Depends es la inyección de dependencias de FastAPI. Cuando el endpoint 
+tiene el parámetro session: Session = Depends(get_session), FastAPI ejecuta 
+get_session, que abre la sesión con el engine, se la pasa al endpoint y cuando 
+la petición termina la cierra automáticamente, porque la función usa con (with) 
+y yield. Con eso no tengo que crear ni cerrar la sesión a mano en cada endpoint, 
+y los cursos y los estudiantes usan exactamente la misma función.
 
 def get_session():
     with Session(engine) as session:
         yield session
 
 
-# 8. ¿Qué significa table=True?
-# Con class Course(SQLModel, table=True) le digo a SQLModel que esa clase 
-# representa una tabla: los campos tipados (name, credits, active) se vuelven 
-# columnas y el id con primary_key=True es la clave primaria. Gracias a eso, 
-# create_all() crea la tabla al iniciar la app. Sin table=True sería un modelo 
-# normal de validación, sin tabla detrás.
+8. ¿Qué significa table=True?
+Con class Course(SQLModel, table=True) le digo a SQLModel que esa clase 
+representa una tabla: los campos tipados (name, credits, active) se vuelven 
+columnas y el id con primary_key=True es la clave primaria. Gracias a eso, 
+create_all() crea la tabla al iniciar la app. Sin table=True sería un modelo 
+normal de validación, sin tabla detrás.
 
 
-# 9. ¿Por qué los datos continúan existiendo después de reiniciar Uvicorn?
-# A diferencia del taller anterior, donde los equipos vivían en una lista 
-# de Python que se perdía al apagar el servidor, aquí los datos se guardan en el 
-# archivo database.db con SQLite. El commit los escribe ahí, y cuando reinicio 
-# Uvicorn, create_all() solo crea las tablas que no existen, no borra las que ya 
-# están. Un detalle: hay que arrancar el servidor desde la misma carpeta, porque 
-# la ruta de la base es relativa (sqlite:///database.db); si lo corro desde otra 
-# carpeta, crearía otro archivo vacío. Eso lo comprobé en las pruebas P09.
+9. ¿Por qué los datos continúan existiendo después de reiniciar Uvicorn?
+A diferencia del taller anterior, donde los equipos vivían en una lista 
+de Python que se perdía al apagar el servidor, aquí los datos se guardan en el 
+archivo database.db con SQLite. El commit los escribe ahí, y cuando reinicio 
+Uvicorn, create_all() solo crea las tablas que no existen, no borra las que ya 
+están. Un detalle: hay que arrancar el servidor desde la misma carpeta, porque 
+la ruta de la base es relativa (sqlite:///database.db); si lo corro desde otra 
+carpeta, crearía otro archivo vacío. Eso lo comprobé en las pruebas P09.
 
 
-# 10. ¿Por qué CourseCreate y CourseUpdate son schemas diferentes?
-# En CourseCreate el campo active es opcional y vale true por defecto, 
-# porque al crear un curso nuevo tiene sentido que quede activo. En CourseUpdate, 
-# como la actualización es completa, name, credits y active son obligatorios y 
-# active no tiene valor predeterminado. Así, si alguien omite active en un PUT, 
-# FastAPI responde 422 en vez de poner true en silencio y pisar el valor que 
-# tenía el curso. Si dejara enviar solo uno de los campos, ya sería una 
-# actualización parcial (PATCH): los campos sean opcionales y el service tendría 
-# que cambiar únicamente los que lleguen.
+10. ¿Por qué CourseCreate y CourseUpdate son schemas diferentes?
+En CourseCreate el campo active es opcional y vale true por defecto, 
+porque al crear un curso nuevo tiene sentido que quede activo. En CourseUpdate, 
+como la actualización es completa, name, credits y active son obligatorios y 
+active no tiene valor predeterminado. Así, si alguien omite active en un PUT, 
+FastAPI responde 422 en vez de poner true en silencio y pisar el valor que 
+tenía el curso. Si dejara enviar solo uno de los campos, ya sería una 
+actualización parcial (PATCH): los campos sean opcionales y el service tendría 
+que cambiar únicamente los que lleguen.
 
 
-# 11. ¿Por qué actualizar un curso no debe generar un nuevo ID?
-# En update_course busco el curso existente con get_course y le asigno 
-# los valores nuevos a ese mismo objeto (course.name = ..., course.credits = ..., 
-# course.active = ...). Como SQLModel sabe que ese objeto ya viene de la base, 
-# el commit hace un UPDATE sobre esa fila y el id se conserva. Si en cambio 
-# construyera un Course nuevo y lo agregara con add, sería un INSERT y aparecería 
-# un curso duplicado con otro id. Además CourseUpdate no incluye el id, así que 
-# el cliente ni siquiera puede cambiarlo. En las pruebas P04c y P04d verifiqué 
-# que el id seguía igual y que la cantidad de cursos no aumentaba.
+11. ¿Por qué actualizar un curso no debe generar un nuevo ID?
+En update_course busco el curso existente con get_course y le asigno 
+los valores nuevos a ese mismo objeto (course.name = ..., course.credits = ..., 
+course.active = ...). Como SQLModel sabe que ese objeto ya viene de la base, 
+el commit hace un UPDATE sobre esa fila y el id se conserva. Si en cambio 
+construyera un Course nuevo y lo agregara con add, sería un INSERT y aparecería 
+un curso duplicado con otro id. Además CourseUpdate no incluye el id, así que 
+el cliente ni siquiera puede cambiarlo. En las pruebas P04c y P04d verifiqué 
+que el id seguía igual y que la cantidad de cursos no aumentaba.
 
 course = get_course(course_id, session)   # El curso que ya existe
 course.name = course_data.name            # Modifico ese mismo objeto
@@ -300,6 +298,45 @@ session.add(course)
 session.commit()
 session.refresh(course)
 
+
+12. ¿Cómo agregaste la tabla Student a la aplicación?
+Primero creé models/student.py con table=True, después schemas/student.py 
+(StudentCreate y StudentResponse), services/student_service.py y 
+routers/students.py, sin mezclarlo con Course. Luego en main.py importé el 
+router de estudiantes y lo incluí con include_router. La tabla se crea sola 
+porque el router importa el service y el service importa el modelo Student, 
+así que el modelo queda registrado y listo para que create_all() lo procese.
+
+
+Reto 1. ¿Qué diferencia hay entre quitar un objeto de una lista en memoria y eliminar un registro de SQLite? ¿Por qué necesito confirmar la transacción?
+Quitar un objeto de una lista (como hacía con remove() en el taller de 
+equipos) solo lo borra de la memoria del programa, y se pierde todo igual 
+cuando se apaga el servidor. Eliminar un registro de SQLite lo borra del 
+archivo en disco, entonces el cambio dura aunque reinicie. Pero ese borrado 
+no es definitivo hasta que confirmo la transacción con commit(): 
+session.delete() solo lo deja pendiente. Si no hago commit, el curso sigue 
+en la base y vuelve a aparecer.
+
+
+Reto 2. ¿Por qué conviene separar CourseCreate de CourseUpdate? ¿Qué cambiaría si permitiera enviar solo uno de los campos?
+Conviene separarlos porque las reglas no son las mismas: al crear, active es 
+opcional con true por defecto; al actualizar (PUT), los tres campos son 
+obligatorios y active no tiene valor predeterminado, para que nadie sobrescriba 
+sin querer. Si permitiera enviar solo un campo, sería una actualización 
+parcial (PATCH): los campos del schema serían opcionales y el service tendría 
+que actualizar únicamente los que lleguen, cuidando que un valor false o 0 
+no se confunda con "no enviado".
+
+
+Reto 3. ¿Qué partes reutilicé y cuáles pertenecen exclusivamente a Students? ¿Por qué no necesito crear otro motor de base de datos?
+Reutilicé la infraestructura que ya existía: el engine y get_session de 
+database/database.py, la forma de organizar las capas (router, schema, service, 
+model), el patrón de create, list y get, y el lifespan que crea las tablas. 
+Lo exclusivo de Students es el modelo Student, los schemas StudentCreate y 
+StudentResponse (con las reglas de nombre, email y semestre), el service con 
+los mensajes "Student not found" y el router con el prefijo /students. No 
+necesito otro motor porque el engine solo apunta al archivo database.db, y un 
+mismo archivo puede tener varias tablas (course y student).
 
 # 12. ¿Cómo agregaste la tabla Student a la aplicación?
 # Primero creé models/student.py con table=True, después schemas/student.py 
