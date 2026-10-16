@@ -1,0 +1,231 @@
+===== P04a =====
+$ curl -i -X GET http://127.0.0.1:8000/courses/1
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 61
+content-type: application/json
+
+{"id":1,"name":"Desarrollo Web II","credits":3,"active":true}
+
+===== P04b =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/1 -H 'Content-Type: application/json' -d '{"name": "Programación II", "credits": 4, "active": false}'
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 61
+content-type: application/json
+
+{"id":1,"name":"Programación II","credits":4,"active":false}
+
+===== P04c =====
+$ curl -i -X GET http://127.0.0.1:8000/courses/1
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 61
+content-type: application/json
+
+{"id":1,"name":"Programación II","credits":4,"active":false}
+
+===== P04d =====
+$ curl -i -X GET http://127.0.0.1:8000/courses
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 457
+content-type: application/json
+
+[{"id":1,"name":"Programación II","credits":4,"active":false},{"id":2,"name":"Bases de Datos","credits":4,"active":true},{"id":3,"name":"Redes","credits":3,"active":false},{"id":4,"name":"Mat","credits":2,"active":true},{"id":5,"name":"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC","credits":2,"active":true},{"id":6,"name":"Cálculo I","credits":1,"active":true},{"id":7,"name":"Cálculo II","credits":6,"active":true}]
+
+===== P04e =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/2 -H 'Content-Type: application/json' -d '{"name": "Bases de Datos", "credits": 4, "active": false}'
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 59
+content-type: application/json
+
+{"id":2,"name":"Bases de Datos","credits":4,"active":false}
+
+===== P04f =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Web", "credits": 3, "active": true}'
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 47
+content-type: application/json
+
+{"id":3,"name":"Web","credits":3,"active":true}
+
+===== P04g =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "credits": 3, "active": true}'
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 124
+content-type: application/json
+
+{"id":3,"name":"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC","credits":3,"active":true}
+
+===== P04h =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Física I", "credits": 1, "active": true}'
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 53
+content-type: application/json
+
+{"id":3,"name":"Física I","credits":1,"active":true}
+
+===== P04i =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Física II", "credits": 6, "active": true}'
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 54
+content-type: application/json
+
+{"id":3,"name":"Física II","credits":6,"active":true}
+
+===== P04j =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Zz", "credits": 3, "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 147
+content-type: application/json
+
+{"detail":[{"type":"string_too_short","loc":["body","name"],"msg":"String should have at least 3 characters","input":"Zz","ctx":{"min_length":3}}]}
+
+===== P04k =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC", "credits": 3, "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 226
+content-type: application/json
+
+{"detail":[{"type":"string_too_long","loc":["body","name"],"msg":"String should have at most 80 characters","input":"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC","ctx":{"max_length":80}}]}
+
+===== P04l =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Química", "credits": 0, "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 143
+content-type: application/json
+
+{"detail":[{"type":"greater_than_equal","loc":["body","credits"],"msg":"Input should be greater than or equal to 1","input":0,"ctx":{"ge":1}}]}
+
+===== P04m =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Química", "credits": 7, "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 137
+content-type: application/json
+
+{"detail":[{"type":"less_than_equal","loc":["body","credits"],"msg":"Input should be less than or equal to 6","input":7,"ctx":{"le":6}}]}
+
+===== P04n =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"credits": 3, "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 112
+content-type: application/json
+
+{"detail":[{"type":"missing","loc":["body","name"],"msg":"Field required","input":{"credits":3,"active":true}}]}
+
+===== P04o =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Química", "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 121
+content-type: application/json
+
+{"detail":[{"type":"missing","loc":["body","credits"],"msg":"Field required","input":{"name":"Química","active":true}}]}
+
+===== P04p =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Química", "credits": 3}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 118
+content-type: application/json
+
+{"detail":[{"type":"missing","loc":["body","active"],"msg":"Field required","input":{"name":"Química","credits":3}}]}
+
+===== P04q =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Química", "credits": "abc", "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 152
+content-type: application/json
+
+{"detail":[{"type":"int_parsing","loc":["body","credits"],"msg":"Input should be a valid integer, unable to parse string as an integer","input":"abc"}]}
+
+===== P04r =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/3 -H 'Content-Type: application/json' -d '{"name": "Química", "credits": 3, "active": "invalido"}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 146
+content-type: application/json
+
+{"detail":[{"type":"bool_parsing","loc":["body","active"],"msg":"Input should be a valid boolean, unable to interpret input","input":"invalido"}]}
+
+===== P04s =====
+$ curl -i -X GET http://127.0.0.1:8000/courses/3
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 54
+content-type: application/json
+
+{"id":3,"name":"Física II","credits":6,"active":true}
+
+===== P04t =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/9999 -H 'Content-Type: application/json' -d '{"name": "Química", "credits": 3, "active": true}'
+
+HTTP/1.1 404 Not Found
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 29
+content-type: application/json
+
+{"detail":"Course not found"}
+
+===== P04u =====
+$ curl -i -X PUT http://127.0.0.1:8000/courses/abc -H 'Content-Type: application/json' -d '{"name": "Química", "credits": 3, "active": true}'
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 154
+content-type: application/json
+
+{"detail":[{"type":"int_parsing","loc":["path","course_id"],"msg":"Input should be a valid integer, unable to parse string as an integer","input":"abc"}]}
+

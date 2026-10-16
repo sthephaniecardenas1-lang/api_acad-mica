@@ -1,0 +1,33 @@
+===== P08a =====
+$ curl -i -X GET http://127.0.0.1:8000/students/1
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 85
+content-type: application/json
+
+{"id":1,"name":"Ana Pérez","email":"ana@universidad.edu","semester":4,"active":true}
+
+===== P08b =====
+$ curl -i -X GET http://127.0.0.1:8000/students/9999
+
+HTTP/1.1 404 Not Found
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 30
+content-type: application/json
+
+{"detail":"Student not found"}
+
+===== P08c =====
+$ curl -i -X GET http://127.0.0.1:8000/students/abc
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 155
+content-type: application/json
+
+{"detail":[{"type":"int_parsing","loc":["path","student_id"],"msg":"Input should be a valid integer, unable to parse string as an integer","input":"abc"}]}
+

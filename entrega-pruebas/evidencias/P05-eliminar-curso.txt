@@ -1,0 +1,77 @@
+===== P05a =====
+$ curl -i -X GET http://127.0.0.1:8000/courses/7
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 55
+content-type: application/json
+
+{"id":7,"name":"Cálculo II","credits":6,"active":true}
+
+===== P05b =====
+$ curl -i -X DELETE http://127.0.0.1:8000/courses/7
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 28
+content-type: application/json
+
+{"message":"Course deleted"}
+
+===== P05c =====
+$ curl -i -X GET http://127.0.0.1:8000/courses/7
+
+HTTP/1.1 404 Not Found
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 29
+content-type: application/json
+
+{"detail":"Course not found"}
+
+===== P05d =====
+$ curl -i -X GET http://127.0.0.1:8000/courses
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 406
+content-type: application/json
+
+[{"id":1,"name":"Programación II","credits":4,"active":false},{"id":2,"name":"Bases de Datos","credits":4,"active":false},{"id":3,"name":"Física II","credits":6,"active":true},{"id":4,"name":"Mat","credits":2,"active":true},{"id":5,"name":"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC","credits":2,"active":true},{"id":6,"name":"Cálculo I","credits":1,"active":true}]
+
+===== P05e =====
+$ curl -i -X DELETE http://127.0.0.1:8000/courses/7
+
+HTTP/1.1 404 Not Found
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 29
+content-type: application/json
+
+{"detail":"Course not found"}
+
+===== P05f =====
+$ curl -i -X DELETE http://127.0.0.1:8000/courses/9999
+
+HTTP/1.1 404 Not Found
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 29
+content-type: application/json
+
+{"detail":"Course not found"}
+
+===== P05g =====
+$ curl -i -X DELETE http://127.0.0.1:8000/courses/abc
+
+HTTP/1.1 422 Unprocessable Entity
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 154
+content-type: application/json
+
+{"detail":[{"type":"int_parsing","loc":["path","course_id"],"msg":"Input should be a valid integer, unable to parse string as an integer","input":"abc"}]}
+

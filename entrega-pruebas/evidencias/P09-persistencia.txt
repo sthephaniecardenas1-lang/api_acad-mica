@@ -1,0 +1,138 @@
+===== P09a =====
+$ curl -i -X GET http://127.0.0.1:8000/courses
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 406
+content-type: application/json
+
+[{"id":1,"name":"Programación II","credits":4,"active":false},{"id":2,"name":"Bases de Datos","credits":4,"active":false},{"id":3,"name":"Física II","credits":6,"active":true},{"id":4,"name":"Mat","credits":2,"active":true},{"id":5,"name":"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC","credits":2,"active":true},{"id":6,"name":"Cálculo I","credits":1,"active":true}]
+
+===== P09b =====
+$ curl -i -X GET http://127.0.0.1:8000/students
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 678
+content-type: application/json
+
+[{"id":1,"name":"Ana Pérez","email":"ana@universidad.edu","semester":4,"active":true},{"id":2,"name":"Luis Gómez","email":"luis@universidad.edu","semester":2,"active":true},{"id":3,"name":"Marta Ruiz","email":"marta@universidad.edu","semester":6,"active":false},{"id":4,"name":"Eva","email":"eva@universidad.edu","semester":3,"active":true},{"id":5,"name":"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE","email":"larga@universidad.edu","semester":3,"active":true},{"id":6,"name":"Pedro Ríos","email":"pedro@universidad.edu","semester":1,"active":true},{"id":7,"name":"Sara León","email":"sara@universidad.edu","semester":10,"active":true}]
+
+===== Uvicorn detenido con Ctrl+C (SIGINT) — log de la primera ejecución =====
+INFO:     127.0.0.1:47806 - "GET /students/9999 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47818 - "GET /students/abc HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:47832 - "GET /courses HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47840 - "GET /students HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [299]
+INFO:     Stopping reloader process [296]
+
+===== Uvicorn iniciado de nuevo desde la misma carpeta — log =====
+INFO:     Will watch for changes in these directories: ['/tmp/pruebas_run']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [378] using StatReload
+INFO:     Started server process [381]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:47904 - "GET /docs HTTP/1.1" 200 OK
+
+===== P09c =====
+$ curl -i -X GET http://127.0.0.1:8000/courses
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 406
+content-type: application/json
+
+[{"id":1,"name":"Programación II","credits":4,"active":false},{"id":2,"name":"Bases de Datos","credits":4,"active":false},{"id":3,"name":"Física II","credits":6,"active":true},{"id":4,"name":"Mat","credits":2,"active":true},{"id":5,"name":"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC","credits":2,"active":true},{"id":6,"name":"Cálculo I","credits":1,"active":true}]
+
+===== P09d =====
+$ curl -i -X GET http://127.0.0.1:8000/students
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 678
+content-type: application/json
+
+[{"id":1,"name":"Ana Pérez","email":"ana@universidad.edu","semester":4,"active":true},{"id":2,"name":"Luis Gómez","email":"luis@universidad.edu","semester":2,"active":true},{"id":3,"name":"Marta Ruiz","email":"marta@universidad.edu","semester":6,"active":false},{"id":4,"name":"Eva","email":"eva@universidad.edu","semester":3,"active":true},{"id":5,"name":"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE","email":"larga@universidad.edu","semester":3,"active":true},{"id":6,"name":"Pedro Ríos","email":"pedro@universidad.edu","semester":1,"active":true},{"id":7,"name":"Sara León","email":"sara@universidad.edu","semester":10,"active":true}]
+
+===== P09e =====
+$ curl -i -X GET http://127.0.0.1:8000/courses/1
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 61
+content-type: application/json
+
+{"id":1,"name":"Programación II","credits":4,"active":false}
+
+===== P09f =====
+$ curl -i -X GET http://127.0.0.1:8000/courses/7
+
+HTTP/1.1 404 Not Found
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 29
+content-type: application/json
+
+{"detail":"Course not found"}
+
+===== P09g =====
+$ curl -i -X POST http://127.0.0.1:8000/courses -H 'Content-Type: application/json' -d '{"name": "Curso de integración", "credits": 2, "active": true}'
+
+HTTP/1.1 201 Created
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 65
+content-type: application/json
+
+{"id":7,"name":"Curso de integración","credits":2,"active":true}
+
+===== P09h =====
+$ curl -i -X GET http://127.0.0.1:8000/students
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 678
+content-type: application/json
+
+[{"id":1,"name":"Ana Pérez","email":"ana@universidad.edu","semester":4,"active":true},{"id":2,"name":"Luis Gómez","email":"luis@universidad.edu","semester":2,"active":true},{"id":3,"name":"Marta Ruiz","email":"marta@universidad.edu","semester":6,"active":false},{"id":4,"name":"Eva","email":"eva@universidad.edu","semester":3,"active":true},{"id":5,"name":"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE","email":"larga@universidad.edu","semester":3,"active":true},{"id":6,"name":"Pedro Ríos","email":"pedro@universidad.edu","semester":1,"active":true},{"id":7,"name":"Sara León","email":"sara@universidad.edu","semester":10,"active":true}]
+
+===== P09i =====
+$ curl -i -X POST http://127.0.0.1:8000/students -H 'Content-Type: application/json' -d '{"name": "Estudiante integración", "email": "integra@universidad.edu", "semester": 5}'
+
+HTTP/1.1 201 Created
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 102
+content-type: application/json
+
+{"id":8,"name":"Estudiante integración","email":"integra@universidad.edu","semester":5,"active":true}
+
+===== P09j =====
+$ curl -i -X GET http://127.0.0.1:8000/courses
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:50 GMT
+server: uvicorn
+content-length: 472
+content-type: application/json
+
+[{"id":1,"name":"Programación II","credits":4,"active":false},{"id":2,"name":"Bases de Datos","credits":4,"active":false},{"id":3,"name":"Física II","credits":6,"active":true},{"id":4,"name":"Mat","credits":2,"active":true},{"id":5,"name":"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC","credits":2,"active":true},{"id":6,"name":"Cálculo I","credits":1,"active":true},{"id":7,"name":"Curso de integración","credits":2,"active":true}]
+
+===== P09k — archivos .db y tablas =====
+$ ls *.db
+database.db
+
+$ python -c "... select name from sqlite_master where type='table'"
+course
+student
+

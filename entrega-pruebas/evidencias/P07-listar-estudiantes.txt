@@ -1,0 +1,22 @@
+===== P07a =====
+$ curl -i -X GET http://127.0.0.1:8000/students
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+
+[]
+
+===== P07b =====
+$ curl -i -X GET http://127.0.0.1:8000/students
+
+HTTP/1.1 200 OK
+date: Fri, 16 Oct 2026 01:40:48 GMT
+server: uvicorn
+content-length: 678
+content-type: application/json
+
+[{"id":1,"name":"Ana Pérez","email":"ana@universidad.edu","semester":4,"active":true},{"id":2,"name":"Luis Gómez","email":"luis@universidad.edu","semester":2,"active":true},{"id":3,"name":"Marta Ruiz","email":"marta@universidad.edu","semester":6,"active":false},{"id":4,"name":"Eva","email":"eva@universidad.edu","semester":3,"active":true},{"id":5,"name":"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE","email":"larga@universidad.edu","semester":3,"active":true},{"id":6,"name":"Pedro Ríos","email":"pedro@universidad.edu","semester":1,"active":true},{"id":7,"name":"Sara León","email":"sara@universidad.edu","semester":10,"active":true}]
+
