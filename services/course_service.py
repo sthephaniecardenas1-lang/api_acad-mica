@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from sqlmodel import Session, select
 
 from models.course import Course
-from schemas.course import CourseCreate
+from schemas.course import CourseCreate, CourseUpdate
 
 
 def create_course(
@@ -57,6 +57,34 @@ def get_course(
             status_code=404,
             detail="Course not found"
         )
+
+    return course
+
+
+def update_course(
+    course_id: int,
+    course_data: CourseUpdate,
+    session: Session
+):
+
+    # busco el curso existente (si no está, get_course lanza el 404)
+    course = get_course(
+        course_id,
+        session
+    )
+
+    # modifico el MISMO objeto y no creo uno nuevo, así se conserva el id
+    # y no se inserta otra fila en la tabla
+    course.name = course_data.name
+    course.credits = course_data.credits
+    # active = False también es un dato válido, por eso se asigna siempre
+    course.active = course_data.active
+
+    session.add(course)
+    # confirma el UPDATE en la base de datos
+    session.commit()
+    # recarga el registro tal como quedó guardado
+    session.refresh(course)
 
     return course
 
